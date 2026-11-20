@@ -6,6 +6,7 @@ import { PencilIcon, TagPlusIcon, UserPlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import * as v from 'valibot';
 
+import { EntityType } from '@/components/library/metadata/types';
 import { InputField } from '@/components/shared-form-fields';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,8 +21,6 @@ import {
 } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from '@/components/ui/toast';
-
-import { EntityType } from '@/components/library/metadata/types';
 
 // ==========================================
 // SCHEMAS & TYPES

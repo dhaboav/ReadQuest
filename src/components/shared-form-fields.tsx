@@ -20,6 +20,14 @@ import {
 } from '@/components/ui/combobox';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
 interface Props {
@@ -82,6 +90,33 @@ function TextareaField({ of, path, label, placeholder, className }: Props) {
   );
 }
 
+function SelectField({ of, path, label, items }: ComboboxProps) {
+  return (
+    <FormischField of={of} path={[path]}>
+      {(field) => (
+        <Field data-invalid={field.errors !== null}>
+          <FieldLabel htmlFor={label}>{label}</FieldLabel>
+          <Select items={items} onValueChange={(value) => field.onChange(value)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent alignItemWithTrigger={false}>
+              <SelectGroup>
+                {items.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          {field.errors && <FieldError errors={field.errors.map((message) => ({ message }))} />}
+        </Field>
+      )}
+    </FormischField>
+  );
+}
+
 function ComboboxField({ of, path, label, items, placeholder }: ComboboxProps) {
   return (
     <FormischField of={of} path={[path]}>
@@ -117,4 +152,4 @@ function ComboboxField({ of, path, label, items, placeholder }: ComboboxProps) {
   );
 }
 
-export { InputField, TextareaField, ComboboxField };
+export { InputField, TextareaField, SelectField, ComboboxField };

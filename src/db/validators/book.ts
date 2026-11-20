@@ -12,43 +12,57 @@ const ImageSchema = v.pipe(
   v.maxSize(2097152, 'Max image size is 2 MB.'),
 );
 
-export const bookFormSchema = v.object({
-  title: v.pipe(
-    v.string(),
-    v.minLength(4, 'Title must be at least 4 characters.'),
-    v.maxLength(255, 'Title cannot exceed 255 characters.'),
-  ),
-  isbn: v.pipe(v.string(), v.length(13, 'ISBN must be exactly 13 characters long')),
-  cover_img: v.nullable(v.optional(v.union([v.string(), ImageSchema]))),
-  author_id: v.pipe(v.unknown(), v.toNumber()),
-  genre_id: v.pipe(v.unknown(), v.toNumber()),
-  total_pages: v.pipe(
-    v.unknown(),
-    v.toNumber(),
-    v.minValue(1, 'Must have at least 1 page.'),
-    v.maxValue(10000, 'Page count cannot exceed 10,000.'),
-  ),
-  published_year: v.pipe(
-    v.unknown(),
-    v.toNumber(),
-    v.minValue(2000, 'Year must be 2000 or later.'),
-    v.maxValue(CURRENT_YEAR, "Year can't be more than present year."),
-  ),
-  description: v.nullable(
-    v.optional(
-      v.union([
-        v.literal(''),
-        v.pipe(
-          v.string(),
-
-          v.minLength(20, 'Description must be at least 20 characters.'),
-          v.maxLength(100, 'Description must be at most 100 characters.'),
-        ),
-      ]),
-      '',
+export const bookFormSchema = v.pipe(
+  v.object({
+    title: v.pipe(
+      v.string(),
+      v.minLength(4, 'Title must be at least 4 characters.'),
+      v.maxLength(255, 'Title cannot exceed 255 characters.'),
     ),
+    isbn: v.pipe(v.string(), v.length(13, 'ISBN must be exactly 13 characters long')),
+    cover_img: v.nullable(v.optional(v.union([v.string(), ImageSchema]))),
+    author_id: v.pipe(v.unknown(), v.toNumber()),
+    genre_id: v.pipe(v.unknown(), v.toNumber()),
+    total_pages: v.pipe(
+      v.unknown(),
+      v.toNumber(),
+      v.minValue(1, 'Must have at least 1 page.'),
+      v.maxValue(10000, 'Page count cannot exceed 10,000.'),
+    ),
+    published_year: v.pipe(
+      v.unknown(),
+      v.toNumber(),
+      v.minValue(2000, 'Year must be 2000 or later.'),
+      v.maxValue(CURRENT_YEAR, "Year can't be more than present year."),
+    ),
+    book_status: v.nullable(v.optional(v.pipe(v.string()))),
+    current_page: v.nullable(
+      v.optional(v.pipe(v.unknown(), v.toNumber(), v.minValue(1, 'Must have at least 1 page.'))),
+    ),
+    description: v.nullable(
+      v.optional(
+        v.union([
+          v.literal(''),
+          v.pipe(
+            v.string(),
+            v.minLength(20, 'Description must be at least 20 characters.'),
+            v.maxLength(100, 'Description must be at most 100 characters.'),
+          ),
+        ]),
+        '',
+      ),
+    ),
+  }),
+
+  // Cross-field validation
+  v.forward(
+    v.check(
+      (input) => input.current_page == null || input.current_page <= input.total_pages,
+      'Current page cannot exceed total pages.',
+    ),
+    ['current_page'],
   ),
-});
+);
 
 // DB
 export const bookInsertSchema = createInsertSchema(book);

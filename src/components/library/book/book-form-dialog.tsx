@@ -1,13 +1,13 @@
 'use client';
 
-import { Form, Field as FormischField, SubmitHandler, reset, useForm } from '@formisch/react';
+import { Form, Field as FormischField, SubmitHandler, getInput, reset, useForm } from '@formisch/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { BookPlusIcon, PencilIcon } from 'lucide-react';
 import { useState } from 'react';
 
 import { BookCover } from '@/components/library/book/book-cover';
 import { getBookFormOptions } from '@/components/library/book/book-form-action';
-import { ComboboxField, InputField, TextareaField } from '@/components/shared-form-fields';
+import { ComboboxField, InputField, SelectField, TextareaField } from '@/components/shared-form-fields';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -31,6 +31,13 @@ interface OptionItem {
   value: number;
   label: string;
 }
+
+const BOOK_STATUS = [
+  { label: 'Select a status', value: null },
+  { label: 'Plan to Read', value: 'want' },
+  { label: 'Reading', value: 'reading' },
+  { label: 'Completed', value: 'completed' },
+];
 
 interface BookFormProps {
   initialData?: BookFormInput;
@@ -56,10 +63,16 @@ export function BookFormDialog({ initialData, onSubmitAction }: BookFormProps) {
       cover_img: initialData?.cover_img ?? '',
       author_id: initialData?.author_id ?? '',
       genre_id: initialData?.genre_id ?? '',
-      total_pages: initialData?.total_pages ?? '',
+      total_pages: initialData?.total_pages ?? 1,
       published_year: initialData?.published_year ?? CURRENT_YEAR,
+      book_status: initialData?.book_status ?? null,
+      current_page: initialData?.current_page ?? null,
       description: initialData?.description ?? '',
     },
+  });
+
+  const bookStatus = getInput(form, {
+    path: ['book_status'],
   });
 
   async function handleOpenChange(open: boolean) {
@@ -132,7 +145,10 @@ export function BookFormDialog({ initialData, onSubmitAction }: BookFormProps) {
         }
       />
 
-      <DialogContent className="max-h-[85vh] overflow-y-auto lg:max-h-[95vh] lg:max-w-xl">
+      <DialogContent
+        showCloseButton={false}
+        className="max-h-[85vh] overflow-y-auto lg:max-h-[95vh] lg:max-w-xl"
+      >
         <DialogHeader>
           <DialogTitle>{formActionTitle} Book</DialogTitle>
           <DialogDescription>
@@ -202,10 +218,21 @@ export function BookFormDialog({ initialData, onSubmitAction }: BookFormProps) {
 
                 <div className="grid gap-4 lg:grid-cols-3">
                   <InputField of={form} path="isbn" label="ISBN" placeholder="978..." />
-
                   <InputField of={form} path="published_year" label="Published" type="number" />
-
                   <InputField of={form} path="total_pages" label="Pages" placeholder="365" type="number" />
+                </div>
+
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <SelectField of={form} path="book_status" label="Status" items={BOOK_STATUS} />
+                  {bookStatus === 'reading' && (
+                    <InputField
+                      of={form}
+                      path="current_page"
+                      label="Current Page"
+                      type="number"
+                      placeholder="Enter current page"
+                    />
+                  )}
                 </div>
 
                 <TextareaField
