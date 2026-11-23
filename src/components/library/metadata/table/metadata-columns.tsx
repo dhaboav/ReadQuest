@@ -13,18 +13,17 @@ export function createColumns({ entityType }: { entityType: EntityType }) {
   const updateAction = entityType === 'authors' ? updateAuthor : updateGenre;
   const deleteAction = entityType === 'authors' ? deleteAuthor : deleteGenre;
   return columnHelper.columns([
-    columnHelper.accessor('id', {
-      header: 'ID',
-    }),
     columnHelper.accessor('name', {
       header: 'Name',
     }),
     columnHelper.accessor('totalBooks', {
       header: 'Total Books',
+      enableGlobalFilter: false,
     }),
     columnHelper.display({
       id: 'actions',
       header: 'Actions',
+      enableGlobalFilter: false,
       cell: ({ row }) => {
         const { id, name } = row.original;
         return (
@@ -36,6 +35,7 @@ export function createColumns({ entityType }: { entityType: EntityType }) {
             />
 
             <DeleteDialog
+              showIcon={true}
               entityType={entityType}
               onDeleteAction={() => deleteAction(id)}
               queryKey={[entityType]}

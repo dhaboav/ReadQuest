@@ -3,19 +3,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { type SortingState, useTable } from '@tanstack/react-table';
 import { cn } from 'cn';
-import { ArrowUpDownIcon, CheckIcon } from 'lucide-react';
+import { ArrowUpDownIcon, SearchIcon } from 'lucide-react';
 import { useState } from 'react';
 
 import { createColumns } from '@/components/library/metadata/table/metadata-columns';
 import type { EntityType, MetadataItemTotalBook } from '@/components/library/metadata/types';
 import { features } from '@/components/library/table-features';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getAuthors } from '@/db/crud/author';
 import { getGenres } from '@/db/crud/genre';
@@ -48,45 +43,57 @@ export function MetadataTable({ entityType, initialData }: MetadataTableProps) {
     features,
     columns,
     data: data,
+    globalFilterFn: 'includesString',
     onSortingChange: setSorting,
     state: { sorting },
   });
 
+  const selectedSort = SortOptions.find((option) =>
+    sorting.some((s) => s.id === option.columnId && s.desc === option.isDesc),
+  );
+
   return (
-    <div className={cn('bg-background p-4 rounded-lg flex flex-col h-full overflow-hidden')}>
-      <div className="flex items-center justify-between pb-3 flex-wrap gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button variant="outline" className="w-full md:max-w-25">
-                <ArrowUpDownIcon />
-                Sort
-              </Button>
-            }
-          />
-          <DropdownMenuContent align="end">
-            {SortOptions.map((option) => {
-              const isActive = sorting.some((s) => s.id === option.columnId && s.desc === option.isDesc);
-              return (
-                <DropdownMenuItem
-                  key={option.label}
-                  onClick={() => {
-                    table.setSorting([{ id: option.columnId, desc: option.isDesc }]);
-                  }}
-                  className="flex items-center justify-between cursor-pointer"
-                >
-                  {option.label}
-                  {isActive && <CheckIcon className="size-4" />}
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <div className={cn('flex h-full flex-col overflow-hidden')}>
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-3">
+        <div className="w-full md:w-sm">
+          <InputGroup>
+            <InputGroupInput
+              value={table.state.globalFilter ?? ''}
+              onChange={(e) => table.setGlobalFilter(e.target.value)}
+              placeholder="Search name..."
+            />
+            <InputGroupAddon>
+              <SearchIcon />
+            </InputGroupAddon>
+          </InputGroup>
+        </div>
+        <Select
+          value={selectedSort?.label ?? null}
+          onValueChange={(value) => {
+            const option = SortOptions.find((item) => item.label === value);
+            if (!option) return;
+
+            table.setSorting([{ id: option.columnId, desc: option.isDesc }]);
+          }}
+        >
+          <SelectTrigger className="w-full md:max-w-40">
+            <ArrowUpDownIcon />
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+
+          <SelectContent align="end" alignItemWithTrigger={false}>
+            {SortOptions.map((option) => (
+              <SelectItem key={option.label} value={option.label}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="flex-1 overflow-auto rounded-lg min-h-0">
-        <Table>
-          <TableHeader className="bg-card sticky top-0">
+      <div className="flex-1 overflow-auto rounded-sm">
+        <Table className="border-ring border">
+          <TableHeader className="sticky top-0">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {

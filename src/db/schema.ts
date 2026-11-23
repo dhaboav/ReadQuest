@@ -15,16 +15,18 @@ export const book = pgTable('book', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   title: text().notNull(),
   isbn: varchar({ length: 13 }).notNull().unique(),
-  description: text(),
   cover_img: text(),
-  total_pages: integer().notNull(),
-  published_year: integer().notNull(),
   author_id: integer()
     .references(() => author.id)
     .notNull(),
   genre_id: integer()
     .references(() => genre.id)
     .notNull(),
+  total_pages: integer().notNull(),
+  published_year: integer().notNull(),
+  book_status: text(),
+  current_page: integer(),
+  description: text(),
   ...timestamps,
 });
 

@@ -3,34 +3,173 @@
 import { useQuery } from '@tanstack/react-query';
 import { type SortingState, useTable } from '@tanstack/react-table';
 import { cn } from 'cn';
-import { ArrowUpDownIcon, CheckIcon } from 'lucide-react';
+import {
+  ArrowUpDownIcon,
+  BookOpenIcon,
+  LayoutGridIcon,
+  LayoutListIcon,
+  SearchIcon,
+  SlidersHorizontalIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 
+import { DeleteDialog } from '@/components/delete-dialog';
+import { BookCard } from '@/components/library/book/table/book-card';
 import { columns } from '@/components/library/book/table/book-columns';
 import { features } from '@/components/library/table-features';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getBooks } from '@/db/crud/book';
-import { Book } from '@/db/validators/book';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { deleteBook, getBooks, updateBook } from '@/db/crud/book';
+import type { Book } from '@/db/validators/book';
+
+import { BookCover } from '../book-cover';
+import { BookFormDialog } from '../book-form-dialog';
 
 const SortOptions = [
   { label: 'Name A-Z', columnId: 'title', isDesc: false },
   { label: 'Name Z-A', columnId: 'title', isDesc: true },
   { label: 'Recently Added', columnId: 'created_at', isDesc: true },
   { label: 'Oldest Added', columnId: 'created_at', isDesc: false },
-  { label: 'Year (Newest)', columnId: 'published_year', isDesc: true },
-  { label: 'Year (Oldest)', columnId: 'published_year', isDesc: false },
+] as const;
+
+const BOOK_STATUS = [
+  { label: 'All', value: null },
+  { label: 'Plan to Read', value: 'want' },
+  { label: 'Reading', value: 'reading' },
+  { label: 'Completed', value: 'completed' },
 ] as const;
 
 interface DataTableProps {
   initialData: Book[];
   className?: string;
+}
+
+// Empty State
+function BookEmptyState() {
+  return (
+    <div className="p-12 text-center">
+      <BookOpenIcon className="text-muted-foreground mx-auto mb-3" />
+      <h3 className="font-semibold">No books found</h3>
+      <p className="text-muted-foreground mt-1 text-sm">Try searching for another book.</p>
+    </div>
+  );
+}
+
+function BookGrid({ books }: { books: Book[] }) {
+  return (
+    <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+      {books.map((book) => (
+        <BookCard key={book.id} book={book} />
+      ))}
+    </div>
+  );
+}
+
+function BookList({ books }: { books: Book[] }) {
+  return (
+    <div className="border-border-strong rounded-sm border-2 p-2">
+      <div className="custom-scrollbar overflow-auto">
+        <Table className="w-full table-auto">
+          <TableHeader className="bg-card text-xs">
+            <TableRow className="hover:bg-transparent">
+              <TableHead>BOOK</TableHead>
+              <TableHead>GENRE</TableHead>
+              <TableHead>STATUS</TableHead>
+              <TableHead>READING PROGRESS</TableHead>
+              <TableHead className="text-center">ACTIONS</TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {books.map((book) => {
+              const progress =
+                book.total_pages > 0
+                  ? Math.min(100, Math.round(((book.current_page ?? 0) / book.total_pages) * 100))
+                  : 0;
+
+              return (
+                <TableRow key={book.id}>
+                  {/* Cover */}
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      {/* Cover */}
+                      <div className="h-16 w-11 shrink-0 overflow-hidden rounded-md">
+                        <BookCover image={book.cover_img} />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <span className="line-clamp-2 font-semibold">{book.title}</span>
+
+                        <span className="text-muted-foreground truncate text-sm">
+                          {book.author?.name ?? '-'}
+                        </span>
+                      </div>
+                    </div>
+                  </TableCell>
+
+                  {/* Genre */}
+                  <TableCell>{book.genre?.name ?? '-'}</TableCell>
+
+                  {/* Status */}
+                  <TableCell>
+                    <Badge variant="outline">{book.book_status}</Badge>
+                  </TableCell>
+
+                  {/* Reading Progress */}
+                  <TableCell>
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">
+                          {book.current_page ?? 0}/{book.total_pages} pages
+                        </span>
+                        <span className="text-primary font-semibold">{progress}%</span>
+                      </div>
+
+                      <div className="bg-muted h-1.5 overflow-hidden rounded-full">
+                        <div
+                          className="bg-primary h-full rounded-full transition-all"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </TableCell>
+
+                  {/* Actions */}
+                  <TableCell className="text-center">
+                    <BookFormDialog
+                      showIcon={true}
+                      initialData={{
+                        isbn: book.isbn,
+                        title: book.title,
+                        cover_img: book.cover_img,
+                        author_id: book.author?.id,
+                        genre_id: book.genre?.id,
+                        published_year: book.published_year,
+                        total_pages: book.total_pages,
+                        book_status: book.book_status,
+                        current_page: book.current_page,
+                        description: book.description,
+                      }}
+                      onSubmitAction={(values) => updateBook(book.id, values)}
+                    />
+                    <DeleteDialog
+                      showIcon={true}
+                      entityType="Book"
+                      onDeleteAction={() => deleteBook(book.id)}
+                      queryKey={['books']}
+                    />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
 }
 
 export function BookTable({ initialData, className }: DataTableProps) {
@@ -47,77 +186,110 @@ export function BookTable({ initialData, className }: DataTableProps) {
     columns,
     data,
     onSortingChange: setSorting,
+    globalFilterFn: 'includesString',
     state: { sorting },
   });
 
+  const rows = table.getRowModel().rows;
+  const isEmpty = rows.length === 0;
+  const statusColumn = table.getColumn('book_status');
+  const selectedSort = SortOptions.find((option) =>
+    sorting.some((s) => s.id === option.columnId && s.desc === option.isDesc),
+  );
+
   return (
-    <div className={cn('bg-background p-4 rounded-lg flex flex-col h-full overflow-hidden', className)}>
-      <div className="flex items-center justify-between pb-3 flex-wrap gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button variant="outline" className="w-full md:max-w-25">
+    <Tabs
+      defaultValue="grid"
+      className={cn('flex h-full min-h-0 flex-col gap-4 overflow-hidden rounded-lg', className)}
+    >
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {/* Search */}
+        <div className="w-full md:w-sm">
+          <InputGroup>
+            <InputGroupInput
+              value={table.state.globalFilter ?? ''}
+              onChange={(e) => table.setGlobalFilter(e.target.value)}
+              placeholder="Search..."
+            />
+            <InputGroupAddon>
+              <SearchIcon />
+            </InputGroupAddon>
+          </InputGroup>
+        </div>
+
+        <div className="flex w-full flex-col gap-1 md:w-fit md:flex-row">
+          <div className="flex w-full gap-4 md:flex-row md:gap-1">
+            <Select
+              items={BOOK_STATUS.map((option) => ({
+                ...option,
+                value: option.value ?? 'all',
+              }))}
+              value={(statusColumn?.getFilterValue() as string) ?? 'all'}
+              onValueChange={(value) => {
+                statusColumn?.setFilterValue(value === 'all' ? undefined : value);
+              }}
+            >
+              <SelectTrigger className="w-full md:max-w-40">
+                <SlidersHorizontalIcon />
+                <SelectValue />
+              </SelectTrigger>
+
+              <SelectContent alignItemWithTrigger={false}>
+                {BOOK_STATUS.map((option) => (
+                  <SelectItem key={option.label} value={option.value ?? 'all'}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={selectedSort?.label ?? null}
+              onValueChange={(value) => {
+                const option = SortOptions.find((item) => item.label === value);
+                if (!option) return;
+
+                table.setSorting([{ id: option.columnId, desc: option.isDesc }]);
+              }}
+            >
+              <SelectTrigger className="w-full md:max-w-40">
                 <ArrowUpDownIcon />
-                Sort
-              </Button>
-            }
-          />
-          <DropdownMenuContent align="end">
-            {SortOptions.map((option) => {
-              const isActive = sorting.some((s) => s.id === option.columnId && s.desc === option.isDesc);
-              return (
-                <DropdownMenuItem
-                  key={option.label}
-                  onClick={() => {
-                    table.setSorting([{ id: option.columnId, desc: option.isDesc }]);
-                  }}
-                  className="flex items-center justify-between cursor-pointer"
-                >
-                  {option.label}
-                  {isActive && <CheckIcon className="size-4" />}
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+
+              <SelectContent align="end" alignItemWithTrigger={false}>
+                {SortOptions.map((option) => (
+                  <SelectItem key={option.label} value={option.label}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* View Toggle */}
+          <TabsList className="w-full border bg-transparent p-0 md:w-fit">
+            <TabsTrigger value="grid" className="p-2">
+              <LayoutGridIcon />
+            </TabsTrigger>
+
+            <TabsTrigger value="list" className="p-2">
+              <LayoutListIcon />
+            </TabsTrigger>
+          </TabsList>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-auto rounded-lg min-h-0">
-        <Table>
-          <TableHeader className="bg-card sticky top-0">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder ? null : <table.FlexRender header={header} />}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getAllCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      <table.FlexRender cell={cell} />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+      {/* Grid View */}
+      <TabsContent value="grid" className="mt-0">
+        {isEmpty ? <BookEmptyState /> : <BookGrid books={rows.map((row) => row.original)} />}
+      </TabsContent>
+
+      {/* List View */}
+      <TabsContent value="list" className="mt-0">
+        {isEmpty ? <BookEmptyState /> : <BookList books={rows.map((row) => row.original)} />}
+      </TabsContent>
+    </Tabs>
   );
 }

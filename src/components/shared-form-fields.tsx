@@ -93,26 +93,34 @@ function TextareaField({ of, path, label, placeholder, className }: Props) {
 function SelectField({ of, path, label, items }: ComboboxProps) {
   return (
     <FormischField of={of} path={[path]}>
-      {(field) => (
-        <Field data-invalid={field.errors !== null}>
-          <FieldLabel htmlFor={label}>{label}</FieldLabel>
-          <Select items={items} onValueChange={(value) => field.onChange(value)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent alignItemWithTrigger={false}>
-              <SelectGroup>
-                {items.map((item) => (
-                  <SelectItem key={item.value} value={item.value}>
-                    {item.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          {field.errors && <FieldError errors={field.errors.map((message) => ({ message }))} />}
-        </Field>
-      )}
+      {(field) => {
+        const selectedItem = items.find((item) => item.value === field.input);
+        return (
+          <Field data-invalid={field.errors !== null}>
+            <FieldLabel htmlFor={label}>{label}</FieldLabel>
+            <Select
+              id={label}
+              items={items}
+              value={selectedItem ?? null}
+              onValueChange={(item: any) => field.onChange(item ? item.value : null)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent alignItemWithTrigger={false}>
+                <SelectGroup>
+                  {items.map((item) => (
+                    <SelectItem key={item.value} value={item}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            {field.errors && <FieldError errors={field.errors.map((message) => ({ message }))} />}
+          </Field>
+        );
+      }}
     </FormischField>
   );
 }

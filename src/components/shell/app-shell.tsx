@@ -1,17 +1,13 @@
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
-import { AppHeader } from './app-header';
 import { AppSidebar } from './app-sidebar';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider className="[--sidebar-width:--spacing(72)] [--header-height:--spacing(12)]">
+    <SidebarProvider className="[--header-height:--spacing(12)] [--sidebar-width:--spacing(72)]">
       <AppSidebar />
       <SidebarInset>
-        <AppHeader />
-        <div className="px-4 lg:px-8 bg-content min-h-[calc(100svh-var(--header-height)-1rem)]">
-          {children}
-        </div>
+        <div className="bg-surface min-h-screen px-4 lg:px-68">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

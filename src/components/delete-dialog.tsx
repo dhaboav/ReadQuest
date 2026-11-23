@@ -15,19 +15,34 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from '@/components/ui/toast';
+
+import { Button } from './ui/button';
 
 interface DeleteDialogProps {
   entityType: string;
   onDeleteAction: () => Promise<{ success?: boolean; message?: string }>;
   queryKey?: unknown[];
+  showIcon?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function DeleteDialog({ entityType, onDeleteAction, queryKey }: DeleteDialogProps) {
+export function DeleteDialog({
+  entityType,
+  onDeleteAction,
+  queryKey,
+  showIcon = false,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+}: DeleteDialogProps) {
   const queryClient = useQueryClient();
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const open = controlledOpen ?? internalOpen;
+  const onOpenChange = controlledOnOpenChange ?? setInternalOpen;
+
   const [_, formAction, isPending] = useActionState(async () => {
     try {
       const response = await onDeleteAction();
@@ -48,27 +63,30 @@ export function DeleteDialog({ entityType, onDeleteAction, queryKey }: DeleteDia
         description: 'An unexpected system error occurred.',
       });
     } finally {
-      setIsOpen(false);
+      onOpenChange(false);
     }
 
     return null;
   }, null);
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogTrigger
-        render={
-          <Button variant="ghost" size="icon" className="text-destructive">
-            <TrashIcon />
-          </Button>
-        }
-      />
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      {showIcon && (
+        <AlertDialogTrigger
+          render={
+            <Button variant="ghost" size="icon" className="text-destructive">
+              <TrashIcon />
+            </Button>
+          }
+        />
+      )}
+
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete {entityType}?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete the selected{' '}
-            <span className="font-semibold text-foreground">{entityType}</span> and remove its data from our
+            <span className="text-foreground font-semibold">{entityType}</span> and remove its data from our
             servers.
           </AlertDialogDescription>
         </AlertDialogHeader>

@@ -3,16 +3,21 @@
 import { MoonIcon, SunIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
-import { Button } from '@/components/ui/button';
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
   return (
-    <Button variant="ghost" size="default" onClick={() => setTheme(isDark ? 'light' : 'dark')}>
-      <SunIcon className="size-4 scale-100 transition-all dark:scale-0" />
-      <MoonIcon className="absolute size-4 scale-0 transition-all dark:scale-100" />
-    </Button>
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <SidebarMenuButton tooltip="Toggle theme" onClick={() => setTheme(isDark ? 'light' : 'dark')}>
+          {isDark ? <MoonIcon /> : <SunIcon />}
+
+          <span>Toggle Theme</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 }

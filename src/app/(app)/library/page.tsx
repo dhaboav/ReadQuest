@@ -25,19 +25,19 @@ export default function LibraryPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="book" className="pt-5 gap-6 flex flex-col">
+        <TabsContent value="book" className="flex flex-col gap-6 pt-5">
           <Suspense fallback={<p>Loading books...</p>}>
             <BookContent />
           </Suspense>
         </TabsContent>
 
-        <TabsContent value="author" className="pt-5 gap-6 flex flex-col">
+        <TabsContent value="author" className="flex flex-col gap-6 pt-5">
           <Suspense fallback={<p>Loading authors...</p>}>
             <AuthorContent />
           </Suspense>
         </TabsContent>
 
-        <TabsContent value="genre" className="pt-5 gap-6 flex flex-col">
+        <TabsContent value="genre" className="flex flex-col gap-6 pt-5">
           <Suspense fallback={<p>Loading genres...</p>}>
             <GenreContent />
           </Suspense>

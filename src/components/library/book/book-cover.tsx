@@ -39,7 +39,6 @@ function useBookCoverPreview(image?: string | File | null) {
       if (!image) return;
 
       if (image instanceof File) {
-        console.log(image.type);
         if (!IMAGE_CONFIG.ALLOWED_TYPES.has(image.type)) return;
 
         objectUrl = URL.createObjectURL(image);
@@ -69,13 +68,12 @@ function useBookCoverPreview(image?: string | File | null) {
 // ============================================
 
 export function BookCover({ title = 'preview', image, className }: BookCoverProps) {
-  console.log(image);
   const previewSrc = useBookCoverPreview(image);
 
   return (
     <div
       className={cn(
-        'relative aspect-2/3 shrink-0 overflow-hidden rounded-lg shadow-sm ring-1 ring-foreground/10',
+        'ring-foreground/10 relative aspect-2/3 shrink-0 overflow-hidden rounded-lg shadow-sm ring-1',
         !previewSrc && 'bg-primary',
         className,
       )}
@@ -92,7 +90,7 @@ export function BookCover({ title = 'preview', image, className }: BookCoverProp
       ) : (
         <div className="flex size-full items-end p-1">
           <span
-            className="line-clamp-3 text-xs font-semibold leading-tight text-background"
+            className="text-background line-clamp-3 text-xs leading-tight font-semibold"
             aria-label={`${title} cover placeholder`}
           >
             {title}

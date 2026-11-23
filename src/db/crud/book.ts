@@ -27,12 +27,14 @@ export async function getBookById(bookId: number) {
       id: book.id,
       title: book.title,
       isbn: book.isbn,
-      description: book.description,
       coverImg: book.cover_img,
-      totalPages: book.total_pages,
-      publishedYear: book.published_year,
       authorName: author.name,
       genreName: genre.name,
+      totalPages: book.total_pages,
+      publishedYear: book.published_year,
+      bookStatus: book.book_status,
+      currentPage: book.current_page,
+      description: book.description,
     })
     .from(book)
     .leftJoin(author, eq(book.author_id, author.id))

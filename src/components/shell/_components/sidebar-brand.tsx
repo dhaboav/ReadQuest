@@ -14,26 +14,33 @@ export function SidebarBrand() {
   const LogoContent = (
     <>
       <span className="grid">
-        <Image
-          src="/react.svg"
-          width={18}
-          height={18}
-          alt="Brand's logo"
-          className="w-auto animate-spin h-5 animation-duration-[10s] group-data-[state=collapsed]:group-hover/side-button:opacity-0 col-start-1 row-start-1 brightness-0 invert"
+        <span
+          className="bg-inverse-foreground animation-duration-[5s] group-data-[state=expanded]:bg-foreground col-start-1 row-start-1 size-5 animate-spin group-data-[state=collapsed]:group-hover/side-button:opacity-0"
+          style={{
+            maskImage: 'url(/react.svg)',
+            maskRepeat: 'no-repeat',
+            maskPosition: 'center',
+            maskSize: 'contain',
+            WebkitMaskImage: 'url(/react.svg)',
+            WebkitMaskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'center',
+            WebkitMaskSize: 'contain',
+          }}
         />
-        <PanelRightClose className="size-5 col-start-1 row-start-1 opacity-0 group-hover/side-button:opacity-100" />
+        <PanelRightClose className="col-start-1 row-start-1 size-5 opacity-0 group-hover/side-button:opacity-100" />
       </span>
+
       <span className="group-data-[state=collapsed]:hidden">ReadQuest</span>
     </>
   );
 
   return (
     <SidebarMenu>
-      <SidebarMenuItem className="flex items-center gap-2 justify-between">
+      <SidebarMenuItem className="flex items-center justify-between gap-2">
         {isOpen ? (
           <SidebarMenuButton
             render={<Link href="/" />}
-            className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors text-sm font-medium"
+            className="text-foreground hover:text-inverse-foreground flex items-center gap-2 text-sm font-medium transition-colors"
           >
             {LogoContent}
           </SidebarMenuButton>
@@ -42,7 +49,7 @@ export function SidebarBrand() {
             onClick={toggleSidebar}
             size="icon"
             variant="outline"
-            className="group/side-button relative flex items-center justify-center bg-primary!"
+            className="group/side-button bg-primary! relative flex items-center justify-center"
             aria-label="Toggle Sidebar"
           >
             {LogoContent}
@@ -53,11 +60,11 @@ export function SidebarBrand() {
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
-          className="grid group/nav size-4 group-data-[state=collapsed]:hidden"
+          className="group/nav grid size-4 group-data-[state=collapsed]:hidden"
         >
           <XIcon className="col-start-1 row-start-1 md:hidden" />
-          <PanelRightIcon className="col-start-1 row-start-1 group-hover/nav:opacity-0 group-data-[state=expanded]:block hidden" />
-          <PanelRightOpenIcon className="col-start-1 row-start-1 opacity-0 group-hover/nav:opacity-100 group-data-[state=expanded]:block hidden" />
+          <PanelRightIcon className="col-start-1 row-start-1 hidden group-hover/nav:opacity-0 group-data-[state=expanded]:block" />
+          <PanelRightOpenIcon className="col-start-1 row-start-1 hidden opacity-0 group-hover/nav:opacity-100 group-data-[state=expanded]:block" />
         </Button>
       </SidebarMenuItem>
     </SidebarMenu>

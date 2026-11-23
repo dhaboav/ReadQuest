@@ -3,7 +3,7 @@
 import { Form, Field as FormischField, SubmitHandler, getInput, reset, useForm } from '@formisch/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { BookPlusIcon, PencilIcon } from 'lucide-react';
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 
 import { BookCover } from '@/components/library/book/book-cover';
 import { getBookFormOptions } from '@/components/library/book/book-form-action';
@@ -41,11 +41,18 @@ const BOOK_STATUS = [
 
 interface BookFormProps {
   initialData?: BookFormInput;
+  showIcon?: boolean;
   onSubmitAction: (values: BookFormOutput) => Promise<{ success?: boolean; message?: string }>;
 }
 
-export function BookFormDialog({ initialData, onSubmitAction }: BookFormProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export interface BookFormDialogRef {
+  openDialog: () => void;
+}
+
+export const BookFormDialog = forwardRef<BookFormDialogRef, BookFormProps>(function BookFormDialog(
+  { initialData, showIcon = false, onSubmitAction },
+  ref,
+) {
   const [authorOptions, setAuthorOptions] = useState<OptionItem[]>([]);
   const [genreOptions, setGenreOptions] = useState<OptionItem[]>([]);
   const [isLoadingOptions, setIsLoadingOptions] = useState(false);
@@ -75,8 +82,10 @@ export function BookFormDialog({ initialData, onSubmitAction }: BookFormProps) {
     path: ['book_status'],
   });
 
+  const [open, setOpen] = useState(false);
+
   async function handleOpenChange(open: boolean) {
-    setIsOpen(open);
+    setOpen(open);
 
     if (!open || optionsLoaded || isLoadingOptions) return;
 
@@ -100,6 +109,12 @@ export function BookFormDialog({ initialData, onSubmitAction }: BookFormProps) {
     }
   }
 
+  useImperativeHandle(ref, () => ({
+    openDialog: () => {
+      void handleOpenChange(true);
+    },
+  }));
+
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -121,8 +136,8 @@ export function BookFormDialog({ initialData, onSubmitAction }: BookFormProps) {
       });
 
       if (response.success) {
-        setIsOpen(false);
-        reset(form);
+        setOpen(false);
+        reset(form, { initialInput: values });
       }
     } catch (error) {
       console.error(error);
@@ -135,15 +150,21 @@ export function BookFormDialog({ initialData, onSubmitAction }: BookFormProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger
-        render={
-          <Button variant={isEditing ? 'ghost' : 'default'} size={isEditing ? 'icon' : 'default'}>
-            {isEditing ? <PencilIcon /> : <BookPlusIcon />}
-            {!isEditing && <span>{formActionTitle} Book</span>}
-          </Button>
-        }
-      />
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      {showIcon && (
+        <DialogTrigger
+          render={
+            <Button
+              variant={isEditing ? 'ghost' : 'default'}
+              size={isEditing ? 'icon' : 'default'}
+              className="rounded-sm"
+            >
+              {isEditing ? <PencilIcon /> : <BookPlusIcon />}
+              {!isEditing && <span>{formActionTitle} Book</span>}
+            </Button>
+          }
+        />
+      )}
 
       <DialogContent
         showCloseButton={false}
@@ -159,7 +180,7 @@ export function BookFormDialog({ initialData, onSubmitAction }: BookFormProps) {
         {isLoadingOptions ? (
           <div className="flex items-center justify-center gap-2 py-10">
             <Spinner />
-            <span className="text-sm text-muted-foreground">Loading authors and genres...</span>
+            <span className="text-muted-foreground text-sm">Loading authors and genres...</span>
           </div>
         ) : (
           <Form id={formHtmlId} of={form} onSubmit={handleFormSubmit} className="my-4 space-y-2">
@@ -274,4 +295,4 @@ export function BookFormDialog({ initialData, onSubmitAction }: BookFormProps) {
       </DialogContent>
     </Dialog>
   );
-}
+});

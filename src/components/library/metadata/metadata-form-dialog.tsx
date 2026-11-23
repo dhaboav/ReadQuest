@@ -97,7 +97,11 @@ export function MetadataFormDialog({ entityType, initialData, onSubmitAction }: 
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger
         render={
-          <Button variant={isEditing ? 'ghost' : 'default'} size={isEditing ? 'icon' : 'default'}>
+          <Button
+            variant={isEditing ? 'ghost' : 'default'}
+            size={isEditing ? 'icon' : 'default'}
+            className="rounded-sm"
+          >
             {isEditing ? <PencilIcon /> : createIcon}
             {!isEditing && <span> {`${formActionTitle} ${entityType}`} </span>}
           </Button>

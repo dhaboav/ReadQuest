@@ -4,8 +4,8 @@
   "htmlWhitespaceSensitivity": "css",
   "printWidth": 110,
   "plugins": [ 
-    "prettier-plugin-tailwindcss",
-    "@trivago/prettier-plugin-sort-imports"
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
   ],
   "importOrder": [
     "<BUILTIN_MODULES>",

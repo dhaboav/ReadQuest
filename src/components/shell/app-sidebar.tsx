@@ -2,6 +2,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/compone
 
 import { MenuGroup } from './_components/menu-group-item';
 import { SidebarBrand } from './_components/sidebar-brand';
+import { ThemeToggle } from './_components/theme-toggle';
 import { NAV_ITEMS } from './nav';
 
 const items = NAV_ITEMS.filter((item) => item.role === 'workspace');
@@ -16,8 +17,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <MenuGroup title="Workspace" items={items} />
       </SidebarContent>
 
-      <SidebarFooter className="text-muted-foreground flex w-full flex-col gap-y-2 px-6 py-4 text-center text-xs group-data-[collapsible=icon]:hidden">
-        <div className="flex flex-col">
+      <SidebarFooter className="text-muted-foreground flex w-full flex-col gap-y-2 py-4 text-center text-xs">
+        <ThemeToggle />
+        <div className="flex flex-col group-data-[collapsible=icon]:hidden">
           <span>Bookshelf v1.2</span>
           <span>
             Created with ❤️ by{' '}

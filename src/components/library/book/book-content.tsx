@@ -10,7 +10,7 @@ export async function BookContent() {
       <PageHeader
         title="Books"
         description="Manage your book list."
-        action={<BookFormDialog onSubmitAction={addBook} />}
+        action={<BookFormDialog onSubmitAction={addBook} showIcon={true} />}
       />
 
       <BookTable initialData={books} />
