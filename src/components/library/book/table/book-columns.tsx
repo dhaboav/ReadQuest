@@ -19,5 +19,6 @@ export const columns = columnHelper.columns([
   }),
   columnHelper.accessor('created_at', {
     id: 'created_at',
+    sortFn: 'datetime',
   }),
 ]);

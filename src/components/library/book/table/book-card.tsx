@@ -1,4 +1,5 @@
-import { BookOpenIcon, EllipsisVerticalIcon, MoreHorizontalIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import { cn } from 'cn';
+import { EllipsisVerticalIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 import { DeleteDialog } from '@/components/delete-dialog';
@@ -14,6 +15,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { deleteBook, updateBook } from '@/db/crud/book';
 import { Book } from '@/db/validators/book';
+
+const statusStyles = {
+  reading: 'bg-blue-500/10 text-blue-500',
+  completed: 'bg-green-500/10 text-green-500',
+  want: 'bg-yellow-500/10 text-yellow-500',
+} as const;
+
+type BookStatus = keyof typeof statusStyles;
 
 export function BookCard({ book }: { book: Book }) {
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -51,9 +60,16 @@ export function BookCard({ book }: { book: Book }) {
       <article className="border-ring flex flex-col justify-between rounded-lg border p-3">
         <div className="bg-surface relative aspect-2/3 w-full overflow-hidden rounded-lg">
           <BookCover image={book.cover_img} />
-          <Badge className="bg-surface text-primary absolute top-2 left-2 rounded-full px-2 py-0.5 font-medium">
-            {book.book_status}
-          </Badge>
+          {book.book_status && (
+            <Badge
+              className={cn(
+                'bg-surface! absolute top-2 left-2 rounded-full px-2 py-0.5 text-xs font-medium',
+                statusStyles[book.book_status as BookStatus],
+              )}
+            >
+              {book.book_status}
+            </Badge>
+          )}
           <div className="absolute top-2 right-2">
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -93,7 +109,7 @@ export function BookCard({ book }: { book: Book }) {
           </div>
 
           {/* Genre */}
-          <Badge className="text-foreground rounded-full bg-black px-2.5 py-0.5 text-xs font-medium">
+          <Badge className="text-foreground bg-input rounded-md px-2.5 py-0.5 text-xs font-medium">
             {book.genre?.name}
           </Badge>
 
@@ -101,7 +117,7 @@ export function BookCard({ book }: { book: Book }) {
           <div className="mt-auto space-y-2 pt-1">
             <div className="flex items-center justify-between gap-2 text-xs">
               <span className="text-muted-foreground font-medium">
-                {book.current_page ?? 0} / {book.total_pages} Pages
+                {book.current_page ?? 0} / {book.total_pages} Pgs
               </span>
 
               <span className="text-primary font-semibold">{pagesPercentage}%</span>

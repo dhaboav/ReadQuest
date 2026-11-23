@@ -14,15 +14,15 @@ export function createColumns({ entityType }: { entityType: EntityType }) {
   const deleteAction = entityType === 'authors' ? deleteAuthor : deleteGenre;
   return columnHelper.columns([
     columnHelper.accessor('name', {
-      header: 'Name',
+      header: 'NAME',
     }),
     columnHelper.accessor('totalBooks', {
-      header: 'Total Books',
+      header: 'TOTAL BOOKS',
       enableGlobalFilter: false,
     }),
     columnHelper.display({
       id: 'actions',
-      header: 'Actions',
+      header: 'ACTIONS',
       enableGlobalFilter: false,
       cell: ({ row }) => {
         const { id, name } = row.original;

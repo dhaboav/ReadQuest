@@ -73,7 +73,7 @@ export function BookCover({ title = 'preview', image, className }: BookCoverProp
   return (
     <div
       className={cn(
-        'ring-foreground/10 relative aspect-2/3 shrink-0 overflow-hidden rounded-lg shadow-sm ring-1',
+        'ring-foreground/10 relative aspect-2/3 h-full w-full overflow-hidden rounded-lg shadow-sm ring-1',
         !previewSrc && 'bg-primary',
         className,
       )}
@@ -85,6 +85,7 @@ export function BookCover({ title = 'preview', image, className }: BookCoverProp
           fill
           sizes="160px"
           unoptimized
+          loading="eager"
           className="object-cover"
         />
       ) : (

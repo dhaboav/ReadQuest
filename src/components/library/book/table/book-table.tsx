@@ -14,6 +14,8 @@ import {
 import { useState } from 'react';
 
 import { DeleteDialog } from '@/components/delete-dialog';
+import { BookCover } from '@/components/library/book/book-cover';
+import { BookFormDialog } from '@/components/library/book/book-form-dialog';
 import { BookCard } from '@/components/library/book/table/book-card';
 import { columns } from '@/components/library/book/table/book-columns';
 import { features } from '@/components/library/table-features';
@@ -25,14 +27,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { deleteBook, getBooks, updateBook } from '@/db/crud/book';
 import type { Book } from '@/db/validators/book';
 
-import { BookCover } from '../book-cover';
-import { BookFormDialog } from '../book-form-dialog';
-
 const SortOptions = [
   { label: 'Name A-Z', columnId: 'title', isDesc: false },
   { label: 'Name Z-A', columnId: 'title', isDesc: true },
-  { label: 'Recently Added', columnId: 'created_at', isDesc: true },
-  { label: 'Oldest Added', columnId: 'created_at', isDesc: false },
+  { label: 'Newest', columnId: 'created_at', isDesc: true },
+  { label: 'Oldest', columnId: 'created_at', isDesc: false },
 ] as const;
 
 const BOOK_STATUS = [
@@ -41,6 +40,14 @@ const BOOK_STATUS = [
   { label: 'Reading', value: 'reading' },
   { label: 'Completed', value: 'completed' },
 ] as const;
+
+const statusStyles = {
+  reading: 'bg-blue-500/10 text-blue-500',
+  completed: 'bg-green-500/10 text-green-500',
+  want: 'bg-yellow-500/10 text-yellow-500',
+} as const;
+
+type BookStatus = keyof typeof statusStyles;
 
 interface DataTableProps {
   initialData: Book[];
@@ -60,7 +67,7 @@ function BookEmptyState() {
 
 function BookGrid({ books }: { books: Book[] }) {
   return (
-    <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+    <div className="mx-auto grid w-full grid-cols-2 gap-5 md:grid-cols-4 lg:grid-cols-6">
       {books.map((book) => (
         <BookCard key={book.id} book={book} />
       ))}
@@ -115,7 +122,17 @@ function BookList({ books }: { books: Book[] }) {
 
                   {/* Status */}
                   <TableCell>
-                    <Badge variant="outline">{book.book_status}</Badge>
+                    {book.book_status && (
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          'rounded-full px-2 py-0.5 text-xs font-medium',
+                          statusStyles[book.book_status as BookStatus],
+                        )}
+                      >
+                        {book.book_status}
+                      </Badge>
+                    )}
                   </TableCell>
 
                   {/* Reading Progress */}
@@ -173,7 +190,7 @@ function BookList({ books }: { books: Book[] }) {
 }
 
 export function BookTable({ initialData, className }: DataTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'title', desc: false }]);
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'created_at', desc: true }]);
 
   const { data } = useQuery({
     queryKey: ['books'],
@@ -219,7 +236,7 @@ export function BookTable({ initialData, className }: DataTableProps) {
         </div>
 
         <div className="flex w-full flex-col gap-1 md:w-fit md:flex-row">
-          <div className="flex w-full gap-4 md:flex-row md:gap-1">
+          <div className="flex w-full gap-1 md:flex-row">
             <Select
               items={BOOK_STATUS.map((option) => ({
                 ...option,
@@ -255,7 +272,7 @@ export function BookTable({ initialData, className }: DataTableProps) {
             >
               <SelectTrigger className="w-full md:max-w-40">
                 <ArrowUpDownIcon />
-                <SelectValue placeholder="Sort by" />
+                <SelectValue />
               </SelectTrigger>
 
               <SelectContent align="end" alignItemWithTrigger={false}>

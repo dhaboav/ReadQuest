@@ -95,10 +95,10 @@ export function MetadataTable({ entityType, initialData }: MetadataTableProps) {
         <Table className="border-ring border">
           <TableHeader className="sticky top-0">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="px-6">
                       {header.isPlaceholder ? null : <table.FlexRender header={header} />}
                     </TableHead>
                   );
@@ -111,7 +111,7 @@ export function MetadataTable({ entityType, initialData }: MetadataTableProps) {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getAllCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="px-6">
                       <table.FlexRender cell={cell} />
                     </TableCell>
                   ))}

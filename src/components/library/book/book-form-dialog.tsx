@@ -137,7 +137,11 @@ export const BookFormDialog = forwardRef<BookFormDialogRef, BookFormProps>(funct
 
       if (response.success) {
         setOpen(false);
-        reset(form, { initialInput: values });
+        if (isEditing) {
+          reset(form, { initialInput: values });
+        } else {
+          reset(form);
+        }
       }
     } catch (error) {
       console.error(error);
@@ -188,7 +192,9 @@ export const BookFormDialog = forwardRef<BookFormDialogRef, BookFormProps>(funct
               <FormischField of={form} path={['cover_img']}>
                 {(field) => (
                   <Field data-invalid={field.errors !== null}>
-                    <BookCover image={field.input} />
+                    <div className="h-40 shrink-0">
+                      <BookCover image={field.input} />
+                    </div>
 
                     <div className="space-y-2">
                       <FieldLabel htmlFor="cover_img">Book Cover</FieldLabel>
