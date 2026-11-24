@@ -67,7 +67,7 @@ function BookEmptyState() {
 
 function BookGrid({ books }: { books: Book[] }) {
   return (
-    <div className="mx-auto grid w-full grid-cols-2 gap-5 md:grid-cols-4 lg:grid-cols-6">
+    <div className="mx-auto grid w-full grid-cols-2 gap-5 md:grid-cols-4 lg:grid-cols-5">
       {books.map((book) => (
         <BookCard key={book.id} book={book} />
       ))}

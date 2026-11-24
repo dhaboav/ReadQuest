@@ -23,7 +23,7 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
+
   --color-border: var(--border);
 
   --color-sidebar-foreground: var(--sidebar-foreground);
@@ -40,7 +40,6 @@
   --text-tiny: 0.625rem;
 
   --color-background: var(--background);
-  --color-content: var(--content);
   --color-primary-button: var(--primary-button);
   --color-secondary-text: var(--secondary-text);
 
@@ -52,6 +51,7 @@
 
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
 }
 
 :root {
@@ -102,7 +102,7 @@
   --muted-foreground: oklch(0.704 0.04 256.788);
   --accent: oklch(0.279 0.041 260.031);
   --accent-foreground: oklch(0.984 0.003 247.858);
-
+  --secondary-text: oklch(0.5542 0.0029 345.28);
   --border: oklch(1 0 0 / 10%);
 
   --sidebar-foreground: oklch(0.984 0.003 247.858);
@@ -112,9 +112,6 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
-
-  --content: #121221;
-  --secondary-text: oklch(0.5542 0.0029 345.28);
 
   /* Fixed */
   --primary: #cba6f7;

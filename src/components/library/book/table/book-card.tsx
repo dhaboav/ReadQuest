@@ -57,7 +57,7 @@ export function BookCard({ book }: { book: Book }) {
         queryKey={['books']}
       />
 
-      <article className="border-ring flex flex-col justify-between rounded-lg border p-3">
+      <article className="border-ring hover:border-primary flex flex-col justify-between rounded-lg border p-3">
         <div className="bg-surface relative aspect-2/3 w-full overflow-hidden rounded-lg">
           <BookCover image={book.cover_img} />
           {book.book_status && (
