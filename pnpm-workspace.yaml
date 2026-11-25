@@ -1,0 +1,10 @@
+allowBuilds:
+  esbuild: false
+permissions:
+  '@tanstack/react-table':
+    skills: false
+  drizzle-kit:
+    skills: false
+overrides:
+  '@types/react': 19.3.0
+  '@types/react-dom': 19.3.0
