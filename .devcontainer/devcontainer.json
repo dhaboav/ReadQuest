@@ -1,5 +1,5 @@
 {
-  "name": "bookshelf",
+  "name": "ReadQuest",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
@@ -13,7 +13,6 @@
   },
   "otherPortsAttributes": {"onAutoForward": "ignore"},
   "postCreateCommand": "pnpm install",
-  "postStartCommand": "pnpm dev",
   "shutdownAction": "stopCompose",
   "customizations": {
     "vscode": {

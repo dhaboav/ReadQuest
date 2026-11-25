@@ -1,6 +1,6 @@
 {
-  "name": "bookshelf",
-  "version": "1.3.0",
+  "name": "ReadQuest",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

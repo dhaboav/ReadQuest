@@ -1,76 +1,85 @@
-# Bookshelf Project
+# ReadQuest
 
-A full-stack digital library management application designed to organize physical book collections, track authors, categorize genres, and search items efficiently.
+A personal reading tracker and book management application designed to help readers track their reading progress, organize their personal reading list, and stay on top of reading goals.
+
+![UI Showcase](public/ui-showcase.avif)
+
+## Features & Overview
+
+- **Reading Progress Tracking:** Monitor pages read, completion percentages, and active reads in real time.
+- **Dashboard & Reading Insights:** View key reading metrics (total books, currently reading, completed, unread) and track progress toward your reading target.
+- **Activity Logs & Quotes:** Keep a chronological log of reading updates and save memorable quotes from your books.
+- **Personal Library Organization:** Categorize books by reading status and search through your personal reading list effortlessly.
+- **Responsive Dark/Light Interface:** Designed for a clean, distraction-free experience across desktop, tablet, and mobile devices.
 
 ## Tech Stack
 
-- **Frontend:** React, Typescript, Vite, Tailwind CSS, shadcn/ui, TanStack Query & Router.
-- **Backend:** FastAPI, SQLModel, Pydantic.
-- **Database:** Postgres.
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS, shadcn/ui, Next.js
+- **Database:** PostgreSQL
+- **Tooling:** Docker & VS Code Dev Containers
 
-## Getting Started
+## Getting Started (Local Setup)
 
 ### Prerequisites
 
-- [Docker](https://www.docker.com) installed on your system.
+Make sure you have the following installed on your machine:
 
-### Quick Setup
+- [Git](https://git-scm.com/)
+- [Node.js](https://nodejs.org/) and [pnpm](https://pnpm.io/) (for running outside Dev Containers)
+- [Docker](https://www.docker.com/) (and [VS Code](https://code.visualstudio.com/) with the **Dev Containers** extension if using containerized development)
 
-Choose how you want to run or deploy the project based on your workflow:
+### 1. Clone the Repository
 
-#### Production-Ready (Docker Compose)
+```bash
+git clone https://github.com/dhaboav/ReadQuest.git
+cd ReadQuest
+```
 
-Best for running the complete, containerized application stack out-of-the-box.
+### 2. Configure Environment Variables
 
-1. Copy the env example file and update it with your credentials:
-    ```bash
-    cp .env.example .env
-    ```
-2. Build the project with docker compose:
-    ```bash
-    docker compose build
-    ```
-3. Wake up the entire app (add `-d` to run in the background, or omit it to view live logs):
-    ```bash
-    docker compose up
-    ```
-4. Put the app to sleep safely when done:
-    ```bash
-    docker compose down
-    ```
-#### Development Environment (Dev Containers)
+Copy the example environment file:
 
-Best for active development and local iteration, providing hot-reloading, a pre-configured VS Code/Codespaces workspace, and a standalone database.
+```bash
+cp .env.example .env.local
+```
 
-- Follow the step-by-step instructions in [.devcontainer/README.md](./.devcontainer/README.md)
+Update the `DB_URL` value in `.env.local` depending on where you run the application:
 
-## Deep Dive Documentation
+- Use `localhost` as the database host when running directly on your local machine.
+- Use `db` as the database host when running inside the Dev Container.
 
-Explore specific component guides, environment setups, and local workflows:
+### 3. Customize Local Settings (Optional)
 
-- 🐳 Dev Container: [.devcontainer/README.md](./.devcontainer/README.md)
-- 🌐 Frontend Coding: [frontend/README.md](./frontend/README.md)
-- 🧠 Backend Coding: [backend/README.md](./backend/README.md)
+- **Reading Goal:** Update the `target_goal` variable in `.env.local` to set your target number of books.
+- **Dashboard Quote:** Edit the quote text directly inside the `QuotesCard` component to customize the displayed quote.
 
-## App Previews
+### 4. Run the Application
 
-### 🎨 Credit Note
-The book cover art is currently using the placeholder artwork from the web novel *Reverend Insanity* by Gu Zhen Ren.
-[![book cover](./frontend/public/cover.jpg)](https://www.webnovel.com/book/reverend-insanity_7996858406002505)
+#### Option A: Using VS Code Dev Containers (Recommended)
 
-### 📱 Mobile View
-| Homepage | Authors & Genres |
-| :---: | :---: |
-| ![Mobile](img/mobile.png) | ![Mobile 2](img/mobile-2.png) |
-| ![Mobile Author](img/author.png) | *(Smoothly adapts to fit small screens!)* |
+1. Open the project folder in VS Code.
+2. Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and select **Dev Containers: Reopen in Container**.
+3. Start the development server:
 
-### 💻 Desktop / PC View
-![PC](img/pc.png)
-![PC Genre](img/pc-2.png)
+   ```bash
+   pnpm dev
+   ```
 
-### 🔍 Interactive API Dashboard
-FastAPI automatically builds an interactive playground where you can test how the data engine works. You can view it live at **http://localhost:8000/docs** after starting the backend.
-![API docs](img/docs.png)
+#### Option B: Running Directly on Your Local Machine
+
+1. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+2. Ensure your local PostgreSQL database is running and matches your `DB_URL` in `.env.local`.
+
+3. Start the development server:
+
+   ```bash
+   pnpm dev
+   ```
 
 ## License
 
