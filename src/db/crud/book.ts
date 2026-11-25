@@ -1,6 +1,6 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import { SQL, count, eq, sql, sum } from 'drizzle-orm';
 import { safeParse } from 'valibot';
 
 import { db } from '@/db/drizzle';
@@ -8,12 +8,61 @@ import { author, book, genre } from '@/db/schema';
 import { Book, BookFormInput, bookInsertSchema, bookUpdateSchema } from '@/db/validators/book';
 import { imageDelete, imageRenaming, imageSave } from '@/utils/image-service';
 
-export async function getBooks(): Promise<Book[]> {
-  const result = await db
+export async function getBookStats() {
+  const [stats] = await db
+    .select({
+      totalBooks: count(),
+
+      readingBooks: sum(sql<number>`CASE WHEN ${book.book_status} = 'reading' THEN 1 ELSE 0 END`),
+
+      completedBooks: sum(sql<number>`CASE WHEN ${book.book_status} = 'completed' THEN 1 ELSE 0 END`),
+
+      unreadBooks: sum(
+        sql<number>`CASE WHEN ${book.book_status} = 'want' OR ${book.book_status} IS NULL THEN 1 ELSE 0 END`,
+      ),
+    })
+    .from(book);
+
+  return stats;
+}
+
+export async function getBookRead() {
+  const [result] = await db
+    .select({
+      currentBooks: count(),
+    })
+    .from(book)
+    .where(eq(book.book_status, 'completed'));
+
+  return {
+    currentBooks: result.currentBooks,
+    targetBooks: Number(process.env.TARGET_BOOKS) || 15,
+  };
+}
+
+export async function getBooks(options?: { limit?: number; where?: SQL; order?: SQL }): Promise<Book[]> {
+  const { limit, where, order } = options ?? {};
+
+  let query = db
     .select()
     .from(book)
     .leftJoin(genre, eq(book.genre_id, genre.id))
-    .leftJoin(author, eq(book.author_id, author.id));
+    .leftJoin(author, eq(book.author_id, author.id))
+    .$dynamic();
+
+  if (where) {
+    query = query.where(where);
+  }
+
+  if (limit) {
+    query = query.limit(limit);
+  }
+
+  if (order) {
+    query = query.orderBy(order);
+  }
+
+  const result = await query;
 
   return result.map(({ book: { author_id, genre_id, ...book }, ...relations }) => ({
     ...book,

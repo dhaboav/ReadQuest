@@ -1,5 +1,5 @@
 import { cn } from 'cn';
-import type { Metadata, Viewport } from 'next';
+import type { Metadata } from 'next';
 import { ThemeProvider } from 'next-themes';
 import { Geist } from 'next/font/google';
 

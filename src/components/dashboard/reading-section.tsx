@@ -1,7 +1,8 @@
-import { ArrowRightIcon, Link } from 'lucide-react';
+import { desc, eq } from 'drizzle-orm';
+import { ArrowRightIcon } from 'lucide-react';
+import Link from 'next/link';
 
 import { BookCover } from '@/components/library/book/book-cover';
-import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -12,6 +13,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { getBooks } from '@/db/crud/book';
+import { book } from '@/db/schema';
 import { Book } from '@/db/validators/book';
 
 function ReadingCard({ book }: { book: Book }) {
@@ -19,38 +21,38 @@ function ReadingCard({ book }: { book: Book }) {
     book.total_pages > 0 ? Math.round(((book.current_page ?? 0) / book.total_pages) * 100) : 0;
 
   return (
-    <Card className="flex w-full min-w-0 flex-row items-center gap-3 p-4">
-      <div className="h-24 w-16 shrink-0 overflow-hidden rounded-md">
-        <BookCover image={book.cover_img} />
-      </div>
-
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <Badge className="w-fit">{book.book_status}</Badge>
-
-        <div className="min-w-0">
-          <p className="truncate font-medium">{book.title}</p>
-          <p className="text-muted-foreground truncate text-sm">{book.author?.name}</p>
+    <Card className="flex w-full min-w-0 p-4">
+      <div className="flex flex-row items-center gap-3">
+        <div className="h-24 w-16 shrink-0 overflow-hidden rounded-md">
+          <BookCover image={book.cover_img} />
         </div>
 
-        <span className="text-muted-foreground truncate text-xs">
-          {book.genre?.name} ⦁ {book.published_year}
-        </span>
-
-        <div className="mt-auto space-y-2 pt-1">
-          <div className="flex items-center justify-between gap-2 text-xs">
-            <span className="text-muted-foreground font-medium">
-              {book.current_page ?? 0} / {book.total_pages} Pgs
-            </span>
-
-            <span className="text-primary font-semibold">{pagesPercentage}%</span>
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <div className="min-w-0">
+            <p className="truncate font-medium">{book.title}</p>
+            <p className="text-muted-foreground truncate text-sm">{book.author?.name}</p>
           </div>
 
-          <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
-            <div
-              className="bg-primary h-full rounded-full transition-all duration-300"
-              style={{ width: `${Math.min(pagesPercentage, 100)}%` }}
-            />
-          </div>
+          <span className="text-muted-foreground truncate text-xs">
+            {book.genre?.name} ⦁ {book.published_year}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-auto space-y-2 pt-1">
+        <div className="flex items-center justify-between gap-2 text-xs">
+          <span className="text-muted-foreground font-medium">
+            {book.current_page ?? 0} / {book.total_pages} Pgs
+          </span>
+
+          <span className="text-primary font-semibold">{pagesPercentage}%</span>
+        </div>
+
+        <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
+          <div
+            className="bg-primary h-full rounded-full transition-all duration-300"
+            style={{ width: `${Math.min(pagesPercentage, 100)}%` }}
+          />
         </div>
       </div>
     </Card>
@@ -58,7 +60,11 @@ function ReadingCard({ book }: { book: Book }) {
 }
 
 export async function ReadingSection() {
-  const books = await getBooks();
+  const books = await getBooks({
+    limit: 10,
+    where: eq(book.book_status, 'reading'),
+    order: desc(book.created_at),
+  });
 
   return (
     <>

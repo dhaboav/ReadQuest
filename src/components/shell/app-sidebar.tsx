@@ -1,5 +1,7 @@
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 
+import { Badge } from '../ui/badge';
+import { Separator } from '../ui/separator';
 import { MenuGroup } from './_components/menu-group-item';
 import { SidebarBrand } from './_components/sidebar-brand';
 import { ThemeToggle } from './_components/theme-toggle';
@@ -17,21 +19,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <MenuGroup title="Workspace" items={items} />
       </SidebarContent>
 
-      <SidebarFooter className="text-muted-foreground flex w-full flex-col gap-y-2 py-4 text-center text-xs">
+      <SidebarFooter className="flex w-full flex-col gap-3">
         <ThemeToggle />
-        <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-          <span>Bookshelf v1.2</span>
-          <span>
-            Created with ❤️ by{' '}
+        <Separator className="group-data-[collapsible=icon]:hidden" />
+        <div className="flex flex-col items-center group-data-[collapsible=icon]:hidden">
+          <div className="mb-1 flex gap-2">
+            <span className="text-foreground text-xs font-semibold tracking-wide">ReadQuest</span>
+            <Badge>v2.0</Badge>
+          </div>
+
+          <p className="text-muted-foreground text-tiny">
+            Crafted with <span className="text-destructive">♥</span> by{' '}
             <a
               href="https://github.com/dhaboav"
               target="_blank"
-              rel="noreferrer"
-              className="font-medium text-red-500 hover:underline"
+              rel="noopener noreferrer"
+              className="hover:text-primary"
             >
               dhaboav
             </a>
-          </span>
+          </p>
         </div>
       </SidebarFooter>
     </Sidebar>

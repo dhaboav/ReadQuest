@@ -7,7 +7,7 @@ import { AuthorContent } from '@/components/library/metadata/author-content';
 import { GenreContent } from '@/components/library/metadata/genre-content ';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export const metadata: Metadata = { title: 'Library · ReadQuest' };
+export const metadata: Metadata = { title: 'ReadQuest · Library' };
 
 export default function LibraryPage() {
   return (

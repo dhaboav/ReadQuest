@@ -194,7 +194,7 @@ export function BookTable({ initialData, className }: DataTableProps) {
 
   const { data } = useQuery({
     queryKey: ['books'],
-    queryFn: getBooks,
+    queryFn: () => getBooks(),
     initialData,
   });
 

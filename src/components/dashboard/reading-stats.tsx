@@ -1,17 +1,21 @@
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
 import {
   BookOpenTextIcon,
-  ChartNoAxesCombinedIcon,
+  BookmarkIcon,
   CircleCheckBigIcon,
   LucideIcon,
   SquareLibraryIcon,
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getBookStats } from '@/db/crud/book';
 
 interface ReadingStatCardProps {
   label: string;
   icon: LucideIcon;
-  data: string;
+  data: number;
   description: string;
 }
 
@@ -25,29 +29,54 @@ function ReadingStatCard({ icon: Icon, ...props }: ReadingStatCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="flex items-baseline gap-1.5">
-        <span className="text-3xl font-bold">{props.data}</span>
+        <span className="text-primary text-3xl font-bold">{props.data}</span>
         <span className="text-muted-foreground text-sm">{props.description}</span>
       </CardContent>
     </Card>
   );
 }
 
-const cardInfo = [
-  { label: 'Total Book', icon: SquareLibraryIcon, content: '42', desc: 'title cataloged' },
-  { label: 'Reading', icon: BookOpenTextIcon, content: '1', desc: 'active session' },
-  { label: 'Completed', icon: CircleCheckBigIcon, content: '2', desc: 'read in full' },
-  { label: 'IDK man', icon: ChartNoAxesCombinedIcon, content: '42', desc: 'book read' },
-] as const;
-
 export function ReadingStats() {
+  const { data: bookStats, isLoading } = useQuery({
+    queryKey: ['book-stats'],
+    queryFn: getBookStats,
+  });
+
+  const cardInfo = [
+    {
+      label: 'Total Books',
+      icon: SquareLibraryIcon,
+      content: bookStats?.totalBooks ?? 0,
+      desc: 'titles cataloged',
+    },
+    {
+      label: 'Reading',
+      icon: BookOpenTextIcon,
+      content: bookStats?.readingBooks ?? 0,
+      desc: 'currently reading',
+    },
+    {
+      label: 'Completed',
+      icon: CircleCheckBigIcon,
+      content: bookStats?.completedBooks ?? 0,
+      desc: 'read in full',
+    },
+    {
+      label: 'Unread',
+      icon: BookmarkIcon,
+      content: bookStats?.unreadBooks ?? 0,
+      desc: 'waiting to be read',
+    },
+  ] as const;
+
   return (
     <>
-      {cardInfo.map((item, index) => (
+      {cardInfo.map((item) => (
         <ReadingStatCard
-          key={index}
+          key={item.label}
           label={item.label}
           icon={item.icon}
-          data={item.content}
+          data={isLoading ? 0 : Number(item.content)}
           description={item.desc}
         />
       ))}
